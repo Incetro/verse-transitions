@@ -2,10 +2,8 @@ import VERSE
 import SwiftUI
 
 /// `NavigationLink` wrapped with `WithViewStore`.
-public struct NavigationLinkWithStore<State, Action, Destination, Label>: View
-where Destination: View,
-      Label: View
-{
+public struct NavigationLinkWithStore<State, Action, Destination, Label>: View where Destination: View, Label: View {
+
     /// Create `NavigationLink` wrapped with `WithViewStore`.
     ///
     /// - The link is active if `State?` is non-`nil` and inactive when it's `nil`.
@@ -17,11 +15,11 @@ where Destination: View,
     ///   - destination: Creates destination view with a store with unwrapped state.
     ///   - label: View used as a link's label.
     public init(
-    _ store: Store<State?, Action>,
-mapState: @escaping (State?) -> State? = { $0 },
-setActive: @escaping (Bool) -> Void,
-destination: @escaping (Store<State, Action>) -> Destination,
-label: @escaping () -> Label
+        _ store: Store<State?, Action>,
+        mapState: @escaping (State?) -> State? = { $0 },
+        setActive: @escaping (Bool) -> Void,
+        destination: @escaping (Store<State, Action>) -> Destination,
+        label: @escaping () -> Label
     ) {
         self.store = store
         self.mapState = mapState
@@ -67,10 +65,10 @@ extension NavigationLinkWithStore where Label == EmptyView {
     ///   - onDeactivate: Invoked when link is deactivated (dismissed).
     ///   - destination: Creates destination view with a store with unwrapped state.
     public init(
-    _ store: Store<State?, Action>,
-mapState: @escaping (State?) -> State? = { $0 },
-onDeactivate: @escaping () -> Void,
-destination: @escaping (Store<State, Action>) -> Destination
+        _ store: Store<State?, Action>,
+        mapState: @escaping (State?) -> State? = { $0 },
+        onDeactivate: @escaping () -> Void,
+        destination: @escaping (Store<State, Action>) -> Destination
     ) {
         self.init(
             store,

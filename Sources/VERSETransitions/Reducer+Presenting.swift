@@ -50,7 +50,6 @@ extension Reducer {
                         )
                         .run(&state, action, environment)
                         .cancellable(id: localEffectsId)
-
                 case let .casePath(casePath):
                     localEffects = localReducer
                         .pullback(

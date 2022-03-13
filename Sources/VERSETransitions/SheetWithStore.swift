@@ -1,10 +1,7 @@
 import VERSE
 import SwiftUI
 
-// MARK: - View
-
 extension View {
-
     /// Adds sheet using `Store` with an optional `State`
     ///
     /// The sheet is presented if `State?` is non-`nil` and dismissed when it's `nil`.
@@ -16,10 +13,10 @@ extension View {
     ///   - content: Creates content view with a store with unwrapped state.
     /// - Returns: View with sheet added in a background view.
     public func sheet<State, Action, Content: View>(
-    _ store: Store<State?, Action>,
-    mapState: @escaping (State?) -> State? = { $0 },
-    onDismiss: @escaping () -> Void,
-    content: @escaping (Store<State, Action>) -> Content
+        _ store: Store<State?, Action>,
+        mapState: @escaping (State?) -> State? = { $0 },
+        onDismiss: @escaping () -> Void,
+        content: @escaping (Store<State, Action>) -> Content
     ) -> some View {
         background(
             WithViewStore(store.scope(state: { $0 != nil })) { viewStore in

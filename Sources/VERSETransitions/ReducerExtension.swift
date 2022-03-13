@@ -2,14 +2,14 @@
 //  ReducerExtension.swift
 //  
 //
-//  Created by Alexander Lezya on 11.03.2022.
+//  Created by Alexander Lezya on 13.03.2022.
 //
 
 import VERSE
 import os.log
 
 extension Reducer {
-
+    
     /// Transforms a reducer that works on local state, action, and environment into one that works on
     /// global state, action and environment.
     ///
@@ -180,19 +180,18 @@ extension Reducer {
     ///   - toLocalEnvironment: A function that transforms `GlobalEnvironment` into `Environment`.
     /// - Returns: A reducer that works on `GlobalState`, `GlobalAction`, `GlobalEnvironment`.
     public func pullback<GlobalState, GlobalAction, GlobalEnvironment>(
-      state toLocalState: EnumKeyPath<GlobalState, State>,
-      action toLocalAction: EnumKeyPath<GlobalAction, Action>,
-      environment toLocalEnvironment: @escaping (GlobalEnvironment) -> Environment,
-      file: StaticString = #fileID,
-      line: UInt = #line
+        state toLocalState: EnumKeyPath<GlobalState, State>,
+        action toLocalAction: EnumKeyPath<GlobalAction, Action>,
+        environment toLocalEnvironment: @escaping (GlobalEnvironment) -> Environment,
+        file: StaticString = #fileID,
+        line: UInt = #line
     ) -> Reducer<GlobalState, GlobalAction, GlobalEnvironment> {
-      .init { globalState, globalAction, globalEnvironment in
-        guard let localAction = toLocalAction.extract(from: globalAction) else { return .none }
-
-        guard var localState = toLocalState.extract(from: globalState) else {
-          #if DEBUG
-            os_log(
-              .fault, dso: rw.dso, log: rw.log,
+        .init { globalState, globalAction, globalEnvironment in
+            guard let localAction = toLocalAction.extract(from: globalAction) else { return .none }
+            guard var localState = toLocalState.extract(from: globalState) else {
+#if DEBUG
+                os_log(
+                    .fault, dso: rw.dso, log: rw.log,
               """
               A reducer pulled back from "%@:%d" received an action when local state was \
               unavailable. …
@@ -217,25 +216,24 @@ extension Reducer {
               actions for this reducer can only be sent to a view store when state is non-"nil". \
               In SwiftUI applications, use "SwitchStore".
               """,
-              "\(file)",
-              line,
-              debugCaseOutput(localAction),
-              "\(State.self)"
+                    "\(file)",
+                    line,
+                    debugCaseOutput(localAction),
+                    "\(State.self)"
+                )
+#endif
+                return .none
+            }
+            defer { globalState = toLocalState.embed(localState) }
+
+            let effects = self.run(
+                &localState,
+                localAction,
+                toLocalEnvironment(globalEnvironment)
             )
-          #endif
-          return .none
+            .map(toLocalAction.embed)
+            return effects
         }
-        defer { globalState = toLocalState.embed(localState) }
-
-        let effects = self.run(
-          &localState,
-          localAction,
-          toLocalEnvironment(globalEnvironment)
-        )
-        .map(toLocalAction.embed)
-
-        return effects
-      }
     }
 }
 

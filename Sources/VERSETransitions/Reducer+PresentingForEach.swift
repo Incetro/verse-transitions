@@ -1,7 +1,6 @@
 import VERSE
 import SwiftUI
 import Collections
-import OrderedCollections
 
 extension Reducer {
     /// Combines the reducer with a local reducer that works on elements of `IdentifiedArray`.
